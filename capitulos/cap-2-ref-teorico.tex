@@ -1,16 +1,10 @@
-%%%% CAPÍTULO 2 - REVISÃO DA LITERATURA (OU REVISÃO BIBLIOGRÁFICA, ESTADO DA ARTE, ESTADO DO CONHECIMENTO)
-%%
-%% O autor deve registrar seu conhecimento sobre a literatura básica do assunto, discutindo e comentando a informação já publicada.
-%% A revisão deve ser apresentada, preferencialmente, em ordem cronológica e por blocos de assunto, procurando mostrar a evolução do tema.
-%% Título e rótulo de capítulo (rótulos não devem conter caracteres especiais, acentuados ou cedilha)
-
 \chapter{Referencial teórico}\label{cap:referencialTeorico}
 
 \section{Áudio digital}
-! Explicar signal path (físico, analógico, digital)
-
 
 \subsection{Amostragem}
+Uma amostragem é a representação numérica da amplitude sonora em um certo período de tempo, sendo a menor quantidade utilizável de áudio digital. Uma gravação com taxa de amostragem de 44KHz, por exemplo, implica em 44000 valores amostrados de um sinal original a cada segundo.
+
 \subsection{Teorema de Amostragem}
 ! Um sinal analógico é infinito
 
@@ -18,22 +12,101 @@
 
 ! Como saber qual a quantidade mínima de amostragens necessária para reproduzir o original?
 
+! Samples: arrays of discrete, evenly time-spaced numbers
+
 \begin{displayquote}
 "Seja um sinal, limitado em banda, e seu intervalo de tempo dividido em partes iguais, de forma que se obtenham intervalos tais que, cada subdivisão compreenda um intervalo com período T segundos, onde T é menor do que fm/2, e se uma amostra instantânea é tomada arbitrariamente de cada subintervalo, então o conhecimento da amplitude instantânea de cada amostra somado ao conhecimento dos instantes em que é tomada a amostra de cada subintervalo contém toda a informação do sinal original."
 \end{displayquote}
 
+\subsection{Canais de Áudio}
+Um canal de áudio é definido como a representação de um som proveniente de um único ponto. Um microfone, por exemplo, pode ser utilizado para produzir um canal de áudio, enquanto uma caixa de som reproduz também um canal de áudio.
+
+Áudio digital pode possuir uma quantidade diversa de canais de dados.
+
+Uma música mixada profissionalmente para fones de ouvido será salvo em um arquivo que possuirá dois canais, com cada um contendo dados que devem ser enviados para cada um dos lados do fone de ouvido. Já áudio mixado para som \textit{surround} no contexto de produção de filmes possuirá tipicamente 6 canais.
+
+% https://caseguard.com/articles/the-various-complexities-of-audio-channels-new-recordings/#:~:text=An%20audio%20channel%20is%20defined,have%20numerous%20channels%20of%20data.
+\subsection{Modulação por código de pulsos (PCM)}
+A modulação por código de pulsos é utilizada para realizar uma representação digital de um sinal analógico. Essa modulação é feita com a amostragem da amplitude de um sinal em intervalos regulares, onde os valores obtidos são então convertidos em representações binárias para que possam posteriormente ser transmitidos.
+
+Esta conversão é tipicamente realizada com a utilização de um conversor analógico-digital. A quantização de um sinal analógico em intervalos regulares permite com que estes sejam facilmente codificados para posterior armazenamento ou manipulação.
+
+% https://www.techopedia.com/definition/24128/pulse-code-modulation-pcm
+
+
+
 % https://www.youtube.com/watch?v=Z0EMObqS90U&list=PLbqhA-NKGP6B6V_AiS-jbvSzdd7nbwwCw&index=3
 
+\subsection{I2S}
+O protocolo I2S (Inter-IC Sound) é um protocolo serial utilizado para a conexão de dispositivos de áudio. Criado em 1986 pela Phillips Semiconductors (agora NXP Semiconductors), sua finalidade é a  propagação de áudio PCM entre diferentes circuitos integrados.
+O barramento consiste de ao menos três linhas:
+\begin{itemize}
+    \item SCK (continuous serial clock): pulsa para cada bit nas linhas de dados. Sua frequência é baseada na taxa de amostragem, número de bits por canal e número de canais.
+    \item WS (Word Select): Informa qual canal está sendo utilizado. O protocolo I2S permite que dois canais sejam enviados em uma mesma linha de dados. Em uma transmissão stereo, é definido que o canal esquerdo seja transferido quando esta linha estiver em baixa, e o canal direito quando ele estiver em alta. Sua sincronização é tipicamente feita na borda de descida desta linha, já que dados são inseridos na borda de subida.
+    % https://web.archive.org/web/20070102004400/http://www.nxp.com/acrobat_download/various/I2SBUS.pdf
+    \item SD (Serial Data): Linha onde são enviados os dados. Dados são enviados com sinal, codificados em complemento de dois, com o bit mais significativo por primeiro. Isso permite que o número de bits por quadro seja arbitrário, sem necessidade de negociação entre o transmissor e o receptor.
+\end{itemize}
+\begin{figure}[!h]
+    \includegraphics[scale=0.5]{figuras/i2s-bus.png}
+    \caption{!! TROCAR POR VERSÃO DE AUTORIA PRÓPRIA !!}
+    \label{fig:circularBuffer}
+\end{figure}
+
 \section{USB}
-\subsection{História}
-O USB (Universal Serial Bus) é um dos padrões da indústria mais utilizadas no mundo [FONTE?]. Este padrão é também um ótimo candidato para a transmissão de áudio digital, possuindo largura de banda para suficiente para transmissão de áudio de alta qualidade.
-\subsection{Áudio USB}
-A utilização do protocolo USB para transmissão e reprodução de áudio não é uma tarefa simples. Além das complexidades inerentes do próprio protocolo, a transmissão de áudio também traz outro leque de dificuldades, como sincronização, codificação/decodificação e conversão digital-analógica. 
-\subsection{Dispositivos de Áudio}
-A utilização do protocolo USB para transmissão e reprodução de áudio não é uma tarefa simples. Além das complexidades inerentes do próprio protocolo, a transmissão de áudio também traz outro leque de dificuldades, como sincronização, codificação/decodificação e conversão digital-analógica. 
+O USB (Universal Serial Bus) é um dos padrões da indústria mais utilizadas no mundo [FONTE?]. Sua finalidade é a padronização da conexão de dispositivos periféricos à computadores, reduzindo a necessidade de diversas interfaces como portas seriais, paralelas, ADB etc. 
+Sua identificação pelo dispositivo receptor é feita por meio de classes USB. Classes podem ser definidas como grupos de dispositivos semelhantes, como de interface humana, armazenamento em massa ou áudio. Ao realizar conexão, o dispositivo é automaticamente identificado e inicializado dependendo do código de classe informado.
+
+Este padrão é também um ótimo candidato para a transmissão de áudio digital, possuindo largura de banda para suficiente para transmissão de áudio de alta qualidade.
+Ainda sim, a transmissão e reprodução de áudio por esse protocolo não é uma tarefa simples. Além das complexidades inerentes do próprio protocolo, a transmissão de áudio também traz outro leque de dificuldades, como sincronização, codificação/decodificação e conversão digital-analógica. 
+
+\subsection{Velocidades de transmissão}
+A especificação USB 2.0 permite três diferentes velocidades de comunicação: \textit{low speed}, de 1.5 megabits por segundo, \textit{full speed}, de 12 megabits por segundo, e high speed, de 480 megabits por segundo. Um dispositivo \textit{low speed} sempre se conectará  nessa velocidade, independente das capacidades de transmissão do dispositivo \textit{host}. Da mesma forma, um positivo \textit{full speed} sempre se conectará nessa velocidade. Um dispositivo \textit{high speed}, porém, se conecta inicialmente em \textit{full speed}, e tenta uma transição para \textit{full speed} posteriormente, caso o dispositivo \textit{host} seja capaz dessa velocidade.
+% https://www.ti.com/video/6305893689112#transcript-tab
+
+\subsection{Transmissão por quadros}
+A transmissão de dados de áudio por USB é feita na linha de dados com modulação por pulso de código. O sinal é enviado em quadros, que se refere a uma amostragem de cada canal presente no áudio original.
+
+% https://sound.stackexchange.com/questions/41567/difference-between-frame-and-sample-in-waveform#:~:text=A%20sample%20is%20the%20smallest,during%20a%20video%20frame%20interval.
+
+\subsection{Classe de Interface de Áudio USB}
+
+A classe de interface de áudio agrupa qualquer aplicação que possa interagir com transferências de dados de áudio USB.
+Entre as aplicações que se encaixam nesse quesito estão aplicações que convertem entre os domínios analógico e digital, e aplicações que transformem uma transferência de dados em outra transferência também compatível com USB. Mesmo aplicações que interajam diretamente com áudio analógico, porém sejam controladas por USB podem se encaixar nessa classe.
+
+O único requisito obrigatório para uma aplicação ser reconhecida como um dispositivo de interface de áudio é expor uma interface de controle de áudio. Porém, para possibilitar um maior leque de funcionalidades, as aplicações muitas vezes também implementam interfaces de transferência de áudio, para o consumo ou produção de dados.
+
+Audio Interface Class Code
+
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline
+Código & Valor \\ \hline
+AUDIO  & 0x01  \\ \hline
+\end{tabular}
+\caption{Lista de códigos de classe de interface de áudio}
+\label{tab:codigos-interface-audio}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline
+Subcódigo           & Valor \\ \hline
+SUBCLASS\_UNDEFINED & 0x00  \\ \hline
+AUDIOCONTROL        & 0x01  \\ \hline
+AUDIOSTREAMING      & 0x02  \\ \hline
+MIDISTREAMING       & 0x03  \\ \hline
+\end{tabular}
+\caption{Lista de subcódigos de classe de interface de áudio}
+\label{tab:subcodigos-interface-audio}
+\end{table}
+\subsection{Padrão USB Audio 1.0}
+
 
 Para que a propagação e controle do sinal digital de áudio seja feita de maneira que mantenha a interoperabilidade (que é um dos principais fatores de adoção do protocolo USB, a organização USB desenvolveu a definição para dispositivos de áudio (\textit{Universal Serial Bus Device Class Definition for Audio Devices}).
 % https://www.mouser.com/pdfDocs/usb-audio-simplified.pdf
+
+Proposto em 1999, este padrão tem seu nome devido a ser feito em cima do padrão USB 1.0 e descreve algumas especificações necessárias para que dispositivos possam ser considerados capazes de reprodução de áudio por USB.
+
 
 Essa definição é pública, e define características que os dispositivos de áudio devem possuir, como devem se comportar, quais agentes descritores devem estar presentes, entre outros fatores. 
 
@@ -46,12 +119,14 @@ A transmissão isócrona é unidirecional e contínua, e possui um foco maior no
 
 Este formato de transmissão também pode ser subdividido em três tipos de operações: assíncrona, síncrona e adaptável.
 
-No modo assíncrono, o receptor fornece feedback para a fonte. Baseado nesse feedback, a fonte ajusta o número de textit{samples} que devem ser enviados para o receptor.
+No sub-modo assíncrono, o receptor fornece feedback para a fonte. Baseado nesse feedback, a fonte ajusta o número de textit{samples} que devem ser enviados para o receptor.
 
-No modo síncrono, a fonte e o receptor utilizam feedback implícito, baseado no SOF (Start of Frame) do USB. Ambos precisam se sincronizar com o SOF.
+No sub-modo síncrono, a fonte e o receptor utilizam feedback implícito, baseado no SOF (Start of Frame) do USB. Ambos precisam se sincronizar com o SOF.
 % https://www.mouser.com/pdfDocs/usb-audio-simplified.pdf
 
-Por fim, o modo adaptativo ???
+Por fim, o sub-modo adaptativo, o receptor se adapta à taxa potencialmente variante do transmissor. 
+
+
 
 \begin{figure}[!h]
   \includegraphics[scale=0.5]{figuras/synchronousmode.png}
@@ -72,29 +147,37 @@ A implementação de \textit{drivers} para essa classe de dispositivos permite q
 
 Para garantir a interoperabilidade entre sistemas e manter os \textit{drivers} o mais genérico possíveis, os mecanismos de conectividade e transporte de dados de áudio precisam ser muito bem definidos e padronizados.  Padrões como a classe de áudio USB 1.0, detalhada adiante, procuram trazer uma solução para esta questão.
 
-\subsection{Amostragens, quadros e canais}
-Uma amostragem é a representação numérica da amplitude sonora em um certo período de tempo, sendo a menor quantidade utilizável de áudio digital. Uma gravação com taxa de amostragem de 44KHz, por exemplo, implica em 44000 valores amostrados de um sinal original a cada segundo.
 
-Mais de uma amostragem pode ser feita de uma mesma fonte, com o objetivo de capturar a característica espacial do áudio. Cada uma dessas amostragens referentes a uma mesma fonte é chamada de um \textit{canal}.
 
-% https://sound.stackexchange.com/questions/41567/difference-between-frame-and-sample-in-waveform#:~:text=A%20sample%20is%20the%20smallest,during%20a%20video%20frame%20interval.
 
-Um \textit{quadro} se refere à união desses dois conceitos: embora sua definição exata possa variar de acordo com o contexto, ele pode ser descrito como um "contêiner" de todas as amostragens de diferentes canais referentes a um mesmo período de tempo.
 
 No USB Full Speed, um frame se refere a uma transferência de 1ms de duração, com tamanho de 1023 bytes (possuindo assim uma taxa de transferência máxima de 1023kb/s).
 
-! Explicar como esses dados são comumente enviados por USB
 % https://microchipdeveloper.com/usb:frames
+% https://www.beyondlogic.org/usbnutshell/usb4.shtml
 
-\subsection{Padrão USB Audio 1.0}
 
-Proposto em 1999, este padrão tem seu nome devido a ser feito em cima do padrão USB 1.0 [FONTE?] e descreve algumas especificações necessárias para que dispositivos possam ser considerados capazes de reprodução de áudio por USB:
 
-\section{PDS}
-! Processamento de áudio: modificação do áudio em um certo domínio
-! Exemplos: amplificação e filtros
-\subsection{História}
+\section{Processamento Digital de Áudio}
+Processamento digital de áudio se refere a uma seção do processamento de sinais com foco na manipulação de sinais de áudio, sendo esses representações digitais de ondas sonoras.
+Seu uso inicial era focado em invenções como o telefone e o rádio, que necessitavam de manipulação para vencer problemas inerentes da tecnologia, relacionados a sua transmissão.
+Após avanços na teoria da comunicação, do teorema da amostragem e da invenção da modulação por código de pulso, um novo leque de aplicações se mostrou possível, inclusive na área de manipulação e até criação de música.
+Hoje, métodos de processamento abrangem desde armazenamento e compressão até síntese e melhorias, como equalização, filtragem, compressão e remoção de eco.
+
 \subsection{Filtros FIR/IIR}
+
+Filtros digitais são divididos em duas categorias: filtros de resposta de impulso infinita (Infinite Impulse Response, IIR) e resposta de impulso finita (Finite Impulse Response, FIR). 
+A distinção entreo os dois se dá devido à sua capacidade ou não de gerar um uma resposta infinita a partir de um sinal finito. A diferença principal consta em sua recursividade, sendo os filtros de resposta de impulso infinita recursivos, e os de resposta de impulso finita não-recursivos.
+
+
+Filtros de resposta de impulso infinita tendem a ser preferíveis para processamento digital de áudio, devido a sua eficiência computacional. Enquanto filtros de resposta de impulso finita utilizam uma implementação convolucional, a possibilidade de utilização de retroalimentação em filtros de resposta de impulso infinita facilita sua implementação, dependendo apenas de somas e multiplicações de valores anteriores em memória.
+
+Filtros de resposta finita precisam de mais coeficientes para atingirem um \textit{rolloff} esperado, e quanto mais termos são adicionados, maior será o atraso adicionado à saída.
+Filtros de resposta infinita, embora tenham que lidar com possíveis problemas de estabilidade, conseguem entregar um \textit{rolloff} em menos termos e adicionando pouco atraso à saída. Como aplicações de áudio USB podem necessitar de respostas em quase tempo real, como telecomunicações, idealmente deve ser adicionado o mínimo de atraso possível ao sinal original.
+% https://www.collimator.ai/reference-guides/what-is-an-fir-vs-iir-filter
+% https://www.juansaudio.com/post/iir-vs-fir-understanding-their-differences
+% https://www.advsolned.com/difference-between-iir-and-fir-filters-a-practical-design-guide/
+% https://community.sw.siemens.com/s/article/introduction-to-filters-fir-versus-iir
 \subsection{Filtros discretos}
 \subsection{Filtros de Equalização (Passa-faixas)}
 
