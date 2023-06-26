@@ -46,14 +46,14 @@ O barramento consiste de ao menos três linhas:
     % https://web.archive.org/web/20070102004400/http://www.nxp.com/acrobat_download/various/I2SBUS.pdf
     \item SD (Serial Data): Linha onde são enviados os dados. Dados são enviados com sinal, codificados em complemento de dois, com o bit mais significativo por primeiro. Isso permite que o número de bits por quadro seja arbitrário, sem necessidade de negociação entre o transmissor e o receptor.
 \end{itemize}
-\begin{figure}[!h]
+\begin{figure}[!h]F
     \includegraphics[scale=0.5]{figuras/i2s-bus.png}
     \caption{!! TROCAR POR VERSÃO DE AUTORIA PRÓPRIA !!}
     \label{fig:circularBuffer}
 \end{figure}
 
 \section{USB}
-O USB (Universal Serial Bus) é um dos padrões da indústria mais utilizadas no mundo [FONTE?]. Sua finalidade é a padronização da conexão de dispositivos periféricos à computadores, reduzindo a necessidade de diversas interfaces como portas seriais, paralelas, ADB etc. 
+O USB (Universal Serial Bus) é um dos padrões da indústria mais utilizadas no mundo. Sua finalidade é a padronização da conexão de dispositivos periféricos à computadores, reduzindo a necessidade de diversas interfaces como portas seriais, paralelas, ADB etc. 
 Sua identificação pelo dispositivo receptor é feita por meio de classes USB. Classes podem ser definidas como grupos de dispositivos semelhantes, como de interface humana, armazenamento em massa ou áudio. Ao realizar conexão, o dispositivo é automaticamente identificado e inicializado dependendo do código de classe informado.
 
 Este padrão é também um ótimo candidato para a transmissão de áudio digital, possuindo largura de banda para suficiente para transmissão de áudio de alta qualidade.

@@ -3,27 +3,29 @@
 \subsection{TIVA e seus pontos fracos}
 O desenvolvimento foi iniciado com a placa EK-TM4C1294XL, que contém o controlador TM4C1294NCPDT. 
 Embora a placa possua capacidade 
-!! Placa EK-TM4C1294XL que contém o controlador TM4C1294NCPDT
 
-!! Não possui firmware específico para essa aplicação (recepção e reprodução de áudio)
+\color{orange}
+Placa EK-TM4C1294XL que contém o controlador TM4C1294NCPDT
 
-!! Não possui I2S
+Não possui firmware específico para essa aplicação (recepção e reprodução de áudio)
 
-!! I2S pode ser emulado com dois I2C, porém apresenta dificuldades com outros componentes da placa
+Não possui I2S
 
-!! Software próprio se tornou instável a ponto de impedir o desenvolvimento
+I2S pode ser emulado com dois I2C, porém apresenta dificuldades com outros componentes da placa
 
-!! Precisaria de uma placa com componentes próprios (codec, DAC, Conector P2) para serem iniciados os testes
+Software próprio se tornou instável a ponto de impedir o desenvolvimento
+
+Precisaria de uma placa com componentes próprios (codec, DAC, Conector P2) para serem iniciados os testes
 \subsection{STM32F769I-DISCO e suas vantagens}
 
-!! Já possui firmware base para comunicação USB
+Já possui firmware base para comunicação USB
 
-!! Possui saída de áudio e display LCD com touch; facilita protótipos
+Possui saída de áudio e display LCD com touch; facilita protótipos
 
-!! Possui I2S, sendo possível seu uso nativo
+Possui I2S, sendo possível seu uso nativo
 
-!! Controlador STM32F769NI possui capacidade um pouco maior de processamento 
-
+Controlador STM32F769NI possui capacidade um pouco maior de processamento 
+\color{black}
 
 \subsection{Possíveis hosts para o device}
 
@@ -42,7 +44,7 @@ Embora os computadores ou dispositivos móveis nos quais os sitemas operacionais
 
 \subsection{Componentes}
 
-!! Serial Audio Interface Codec
+\subsubsection{Serial Audio Interface Codec}
 % https://www.st.com/resource/en/product_training/STM32F7_Peripheral_SAI.pdf
 
 \color{red}
@@ -66,13 +68,44 @@ external audio data compatible with SPDIF specifications.
 For audio playback, the STM32 board is recognized by the PC (USB Host) as a USB
 speaker. The PC sends audio samples to the board via the USB. The STM32 MCU
 configures the audio codec via the I2C
+% https://www.cirrus.com/products/wm8994/
+The WM8994 is a highly integrated, ultra low power hi-fi codec with an integrated stereo Class D and AB speaker driver, and a Class W headphone driver to minimize power consumption during audio playback. The device requires only Vbatt and a 1.8V supply, generating all other internal supply rails from integrated LDOs. Stereo full duplex asynchronous sample rate conversion and multi-channel digital mixing combined with powerful analog mixing to support a wide range of different architectures and use cases. A fully programmable parametric EQ provides speaker compensation and a dynamic range controller can be used in the ADC or DAC paths for maintaining a constant signal level, maximizing loudness and protecting speakers against overloading and clipping. A smart digital microphone interface provides power regulation, a low jitter clock output and decimation filters for up to four digital microphones. A MIC activity detect with interrupt is available. Active ground loop noise rejection and DC offset correction help prevent pop noise and suppress ground noise on the headphone outputs.
 \color{black}
 
-!! DAC
+\color{orange}
+Possui DAC de 24bits e 4 canais
 
-!! Output jack
+Driver de 2W classe D/AB
+\color{black}
+
+\subsubsection{Output Jack}
 
 \section{Firmware}
+
+\subsection{Inicialização de projeto}
+
+Existem diversas maneiras de se iniciar um projeto para placas da STM, cada um focando em uma ponta do ecosistema criado pela empresa.
+
+Projetos podem ser criados pelo Mbed Studio, que possui uma interface mais moderna baseada no VSCode (o editor com maior crescimento entre desenvolvedores nos últimos anos), e se propôe a facilitar o ponto de entrada para desenvolvimento e encurtar o processo desde concepção até funcionamento. Para atingir essa proposta, porém, esta IDE acaba sendo mais limitada em questão de controle fino do hardware, tornando-se dependente de bibliotecas já prontas ou que façam ponte com o editor para que o usuário possa acessar a funcionalidade desejada.
+
+Outro caminho para a criação dos projetos conta com a utilização do STM32CubeIDE, uma IDE baseada no mais tradicional editor Eclipse. Embora possua uma experiência de usuário mais defasada em relação ao editor anterior, funcionalidades de controle gráfico do hardware e de configurações das funcionalidades da placa oferecem um maior controle sem uma grande diminuição da produtividade. Essas funcionalidades se tornam possíveis devido à geração automática de código disponibilizada pelo editor. Alterações em parâmetros, ou ativação/desativação de funcionalidades da placa desencadeiam mudanças automáticas de código, configurando inicializações, registradores e outros processos necessários de maneira automatizada.
+
+\begin{figure}[!h]
+  \includegraphics[scale=0.5]{figuras/clock.png}
+  \caption{Exemplo de configuração visual de parâmetros de clock disponibilizado pela STM32CubeIDE}
+  \label{fig:visualClockEdit}
+\end{figure}
+
+
+Anterior à disponibilidade do STM32CubeIDE, projetos tipicamente eram criados com a ferramenta SW4STM32, proveniente de uma empresa terceira, também baseada em Eclipse. Diversos projetos estruturados com a intenção de demonstrar a construção inicial para diversas funcionalidades (como a transmissão de áudio utilizando as camadas de abstração de hardware disponíveis) foram criadas nesse formato. Embora o uso dessa IDE seja deprecada atualmente, seus projetos podem ser convertidos para o foramto do STM32CubeIDE, embora com perdas de algumas de suas funcionalidades (como a edição visual de parâmetros das funcionalidades da placa). Isso se dá devido a conflitos entre o código automaticamente gerado pela IDE e o código legado já presente no projeto.
+
+Para este projeto, foi utilizado um projeto de áudio base iniciado em SW4STM32, e migrado para STM32CubeIDE. 
+
+\color{orange}
+Essa escolha foi tomada pensando na melhor relação entre o ganho de produtividade com a utilização de ferramentas mais avançadas, o ganho de produtividade presente em utilizar uma base já pré-configurada de comunicação USB, e a facilidade de utilização das ferramentas.
+\color{black}
+
+
 \subsection{HAL, BSP e CMSIS}
 Este projeto conta com a utilização de camadas de abstração de hardware que ???. Entre elas, estão a HAL (Hardware Abstraction Layer), BSP (Board Support Package) e CMSIS (Common Microcontroller Software Interface Standard).
 \\[10pt]
@@ -94,23 +127,31 @@ Para este projeto, foi utilizado a BSP da placa STM32F769I-DISCO.
 
 O \textit{Common Microcontroller Software Interface Standard (CMSIS)} é um conjunto de ferramentas, \textit{frameworks} e funcionalidades que implementam funcionalidades, mecânicas e utilidades comumente utilizadas no desenvolvimento embarcado, com o intuito de reduzir o atrito inicial do desenvolvimento, evitar re-trabalhos e reduzir e o tempo até o mercado de um produto até o mercado. Ele funciona em paralelo à Hardware Abstraction Layer, inclusive dependendo da versão específica dessa abstração para alguma de suas funcionalidades.
 
-!! As partes não são diretamente compatíveis: BSP, HAL e CMSIS devem estar em versões corretas para que sua interação ocorra corretamente
+\color{orange}
+As partes não são diretamente compatíveis: BSP, HAL e CMSIS devem estar em versões corretas para que sua interação ocorra corretamente
 
-!! A versão de BSP com a base para a comunicação de áudio USB utilizada uma versão antiga da HAL
+O editor Mbed não disponibiliza acesso fácil à essas camadas de abstração, não sendo uma opção viável para o projeto
 
-!! As bibliotecas de interface humana (\textit{display}, \textit{touch}, serial) utilizavam uma versão mais atualizada da HAL
+A versão de BSP utilizada no projeto base de comunicação de áudio USB utilizava uma versão antiga da HAL
 
-!! A ideia inicial era de portar o código antigo da BSP de áudio USB para a nova HAL
+As bibliotecas de interface humana (\textit{display}, \textit{touch}, serial) utilizavam uma versão mais atualizada da HAL
 
-!! As mudanças entre versões da HAL são bem abrangentes, incluindo parâmetros de funções e estruturas de dados
+A ideia inicial era de portar o código antigo da BSP de áudio USB para a nova HAL (e permitir a utilização das funcionalidades de controle visual de hardware)
 
-!! Atualizar a versão antiga da BSP precisaria quase de uma reescrita do código de conexão com a HAL
+A junção inicial dos códigos não foi bem sucedida, fazendo com que as funcionalidades em conjunto causassem hard faults sem motivo aparente
 
-!! Foi preferido realizar o processo inverso, e realizar um \textit{downgrade} da HAL das funcionalidades de interface humana para serem compatíveis com o código BSP de áudio USB
+A causa eram devido a mudanças entre versões da HAL serem bem abrangentes, incluindo parâmetros de funções e estruturas de dados
 
-!! O principal impasse desse processo foi devido a \textit{hard faults} que ocorriam quando os códigos eram inicializados simultaneamente. Cada módulo funcionava corretamente em isolamento, porém causavam a placa a parar de responder caso fossem inicializados juntos
+Foram identificados problemas onde acessos indevidos de memória devido à mudança das estruturas (onde uma estrutura era acessada no formato de outra estrutura, causando undefined behavior
 
-!! Foi identificado que um problema de timing ocorria entre as bibliotecas, onde alguns registradores eram acessados ou escritos em momentos que estavam sendo acessados por outra biblioteca. A adição de um atraso entre as inicializações das diferentes funcionalidades deixou a inicialização da placa um pouco mais lenta, porém resolveu completamente o problema de \textit{hard faults} no momento de inicialização
+Atualizar a versão antiga da BSP precisaria quase de uma reescrita do código de conexão com a HAL, o que incluiria re-escrita de toda a camada de abstração de comunicação USB
+
+Foi preferido realizar o processo inverso, e realizar um \textit{downgrade} da HAL das funcionalidades de interface humana para serem compatíveis com o código BSP de áudio USB
+
+Outra causa de \textit{hard faults} era devido a os códigos eram inicializados simultaneamente. Cada módulo funcionava corretamente em isolamento, porém causavam a placa a parar de responder caso fossem inicializados juntos
+
+Além do problema inicial de diferença estrutural, foi identificado que um problema de timing ocorria entre as bibliotecas, onde alguns registradores eram acessados ou escritos em momentos que estavam sendo acessados por outra biblioteca. A adição de um atraso entre as inicializações das diferentes funcionalidades deixou a inicialização da placa um pouco mais lenta, porém resolveu completamente o problema de \textit{hard faults} no momento de inicialização
+\color{black}
 
 % [https://www.arm.com/technologies/cmsis#:~:text=Common Microcontroller Software Interface Standard,to market for new devices](https://www.arm.com/technologies/cmsis#:~:text=Common%20Microcontroller%20Software%20Interface%20Standard,to%20market%20for%20new%20devices).
 
@@ -124,14 +165,15 @@ O \textit{Common Microcontroller Software Interface Standard (CMSIS)} é um conj
 Algumas configurações precisam ser enviadas na conexão com a fonte para que o dispositivo seja reconhecido corretamente como um dispositivo de áudio. Duas das principais configurações necessárias são os VIDs e PIDs, ambos números de 16 bits tipicamente representados em hexadecimal.
 
 \subsection{Seleção de parâmetros para transmissão}
+\color{orange}
+Explicar por que foi escolhido 48k (comentar das poucas diferenças em taxas maiores de amostragem e até problemas de fold back/fold over
 
-!! Explicar por que foi escolhido 48k (comentar das poucas diferenças em taxas maiores de amostragem e até problemas de fold back/fold over
 
-!! Comentar do uso de 2 canais (stereo)
+Comentar do uso de 2 canais (stereo)
 
-!! Comentar do uso de 16 bit (mostrar relação com noise floor já aceitável)
+Comentar do uso de 16 bit (mostrar relação com noise floor já aceitável)
 
-!! Comentar de buffer size ser 10240 bytes (com margem de 1 packet)
+Comentar de buffer size ser 10240 bytes (com margem de 1 packet)
 
 % // computes the nominal size(number of bytes) of an audio packet required for one millisecond
 % // e.g. for 48KHZ   / 24 bits / stereo, the required size is 48 * 3 * 2
@@ -143,9 +185,12 @@ Algumas configurações precisam ser enviadas na conexão com a fonte para que o
 % //      for 44.1KHZ / 16 bits  /stereo, required size is 45 * 2 * 2
 % #define AUDIO_MS_MAX_PACKET_SIZE(freq,channel_count,res_byte) AUDIO_MS_PACKET_SIZE(freq+999,channel_count,res_byte)
 
-!! Packet para 1ms em 48KHz e 16 bits stereo contém 48 * (16 / 8) * 2 = 192bytes
+Packet para 1ms em 48KHz e 16 bits stereo contém 48 * (16 / 8) * 2 = 192bytes
+\color{black}
 
 % https://en.wikipedia.org/wiki/USB_Implementers_Forum
+
+\subsection{Identificação como dispositivo de áudio por dispositivos host}
 
 \textit{VIDs (Vendor IDs)} são números que identificam um fabricante ou fornecedor de dispositivos USB. Esse identificador é fornecido pelo USB Implementers Forum, necessitando de licenças anuais de custo elevado. Algumas fabricantes de microcontroladores permitem o uso de sua licença para fins não comerciais ou de pequena escala. Este projeto utiliza o vendor ID da STMicroelectronics (0x0483)
 
@@ -165,9 +210,12 @@ Para se adequar ao padrão produtor-consumidor utilizado na transmissão USB, um
 
 Ponteiros de leitura e escrita são utilizados para indicação de onde novos pacotes devem ser lidos e onde devem ser escritos, respectivamente. O ponteiro de leitura é administrado pelo nó de saída de áudio, e o de escrita pelo nó de entrada USB.
 
-!!Explicar como dados são inseridos no buffer!!. O ponteiro de escrita é então incrementado para refletir a presença dos novos dados presentes no buffer.
+\color{orange}
 
-!! Explicar como dados são consumidos do buffer!!. O ponteiro de leitura é incrementado para refletir esta leitura.
+Explicar como dados são inseridos no buffer. O ponteiro de escrita é então incrementado para refletir a presença dos novos dados presentes no buffer.
+
+Explicar como dados são consumidos do buffer. O ponteiro de leitura é incrementado para refletir esta leitura.
+\color{black}
 
 Através de DMA, os dados são então transferidos para o SAI (e em sequência para o codec).
 
@@ -251,9 +299,13 @@ then cascaded in order to minimize the coefficient quantization and the recursiv
 accumulation errors. Cascaded biquads execute more slowly than their direct form
 counterparts, but are more stable and minimize the effects of errors due to finite
 arithmetic errors.
+
+\color{orange}
+
+Implementado filtro inicial passa baixa para validação de funcionamento
+
 \color{black}
 
-!! Implementado filtro inicial passa baixa para validação de funcionamento
 \begin{sourcecode}[!ht]
 \centering
 \begin{minted}{c}
@@ -289,42 +341,47 @@ arithmetic errors.
 \end{minted}
 \caption{Código de filtro passa baixa empregado pelo interceptador}\label{code:CML}
 \end{sourcecode}
-!! Combinação de filtros IIR Biquadráticos é a melhor solução para a implementação de filtros passa faixa
 
-!! Os pontos de queda de -3db entre filtros adjacentes devem ser iguais, para que não haja influencia de um passa faixa no filtro próximo
+\color{orange}
+Combinação de filtros IIR Biquadráticos é a melhor solução para a implementação de filtros passa faixa
+
+Os pontos de queda de -3db entre filtros adjacentes devem ser iguais, para que não haja influencia de um passa faixa no filtro próximo
 % https://electronics.stackexchange.com/questions/104330/poor-mans-equalizer-with-a-few-digital-bandpass-filters-how-to-overlap-band-e
 
-\begin{sourcecode}[htb]
-\caption{\label{codigo:classeFoo}Classe Aluno}
-\begin{lstlisting}[frame=single, language=c]
-    int16_t AudioUserDsp_LowPassFilter(
-    int16_t sample, 
-    uint32_t iteration
-    )
-    {
-      a0 = 0.011050373933114971f;
-      a1 = 0.022100747866229942f;
-      a2 = 0.011050373933114971f;
-      b1 = -1.3368583644305965f;
-      b2 = 0.3810598601630564f;
+Embora os coeficientes possam ser obtidos analiticamente, a melhor maneira de se obtê-los agora é com alguma ferramenta numérica. Essa forma permite uma maior velocidade de desenvolvimento, e também de iterações de testes, fazendo com que o filtro possa ser corrigido com mais agilidade até que o resultado real desejado seja obtido.
+\color{black}
+
+% \begin{sourcecode}[htb]
+% \caption{\label{codigo:classeFoo}Classe Aluno}
+% \begin{lstlisting}[frame=single, language=c]
+%     int16_t AudioUserDsp_LowPassFilter(
+%     int16_t sample, 
+%     uint32_t iteration
+%     )
+%     {
+%       a0 = 0.011050373933114971f;
+%       a1 = 0.022100747866229942f;
+%       a2 = 0.011050373933114971f;
+%       b1 = -1.3368583644305965f;
+%       b2 = 0.3810598601630564f;
     
-      double fInSample = (float)(sample >> 2);
-      double fOutSample = 
-          a0 * fInSample 
-        + a1 * in_z1 
-        + a2 * in_z2
-        - b1 * out_z1
-        - b2 * out_z2;
-    
-    
-      in_z2   = in_z1;
-      in_z1   = fInSample;
-      out_z2  = out_z1;
-      out_z1  = fOutSample;
+%       double fInSample = (float)(sample >> 2);
+%       double fOutSample = 
+%           a0 * fInSample 
+%         + a1 * in_z1 
+%         + a2 * in_z2
+%         - b1 * out_z1
+%         - b2 * out_z2;
     
     
-      return (int16_t)fOutSample;
-    }
-\end{lstlisting}
-\fonte{}
-\end{sourcecode}
+%       in_z2   = in_z1;
+%       in_z1   = fInSample;
+%       out_z2  = out_z1;
+%       out_z1  = fOutSample;
+    
+    
+%       return (int16_t)fOutSample;
+%     }
+% \end{lstlisting}
+% \fonte{}
+% \end{sourcecode}
