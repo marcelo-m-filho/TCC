@@ -6,17 +6,27 @@
 Uma amostragem é a representação numérica da amplitude sonora em um certo período de tempo, sendo a menor quantidade utilizável de áudio digital. Uma gravação com taxa de amostragem de 44KHz, por exemplo, implica em 44000 valores amostrados de um sinal original a cada segundo.
 
 \subsection{Teorema de Amostragem}
-! Um sinal analógico é infinito
+\color{orange}
+Um sinal analógico é infinito
 
-! Queremos gravá-lo em uma quantidade finita e de preferência a menor quantidade de dados possível
+Queremos gravá-lo em uma quantidade finita e de preferência a menor quantidade de dados possível
 
-! Como saber qual a quantidade mínima de amostragens necessária para reproduzir o original?
+Como saber qual a quantidade mínima de amostragens necessária para reproduzir o original?
 
-! Samples: arrays of discrete, evenly time-spaced numbers
+Podemos nos basear na fisiologia humana média para determinarmos qual uma faixa ideal
+
+Humanos conseguem ouvir acima de 20khz, mas o sinal precisa ter uma amplitude enorme para que seja detectável
+
+Não vale a pena o esforço para reproduzirmos essas faixas
+
+Samples: arrays of discrete, evenly time-spaced numbers
 
 \begin{displayquote}
 "Seja um sinal, limitado em banda, e seu intervalo de tempo dividido em partes iguais, de forma que se obtenham intervalos tais que, cada subdivisão compreenda um intervalo com período T segundos, onde T é menor do que fm/2, e se uma amostra instantânea é tomada arbitrariamente de cada subintervalo, então o conhecimento da amplitude instantânea de cada amostra somado ao conhecimento dos instantes em que é tomada a amostra de cada subintervalo contém toda a informação do sinal original."
 \end{displayquote}
+
+\color{black}
+
 
 \subsection{Canais de Áudio}
 Um canal de áudio é definido como a representação de um som proveniente de um único ponto. Um microfone, por exemplo, pode ser utilizado para produzir um canal de áudio, enquanto uma caixa de som reproduz também um canal de áudio.
@@ -119,7 +129,7 @@ A transmissão isócrona é unidirecional e contínua, e possui um foco maior no
 
 Este formato de transmissão também pode ser subdividido em três tipos de operações: assíncrona, síncrona e adaptável.
 
-No sub-modo assíncrono, o receptor fornece feedback para a fonte. Baseado nesse feedback, a fonte ajusta o número de textit{samples} que devem ser enviados para o receptor.
+No sub-modo assíncrono, o receptor fornece feedback para a fonte. Baseado nesse feedback, a fonte ajusta o número de \textit{samples} que devem ser enviados para o receptor.
 
 No sub-modo síncrono, a fonte e o receptor utilizam feedback implícito, baseado no SOF (Start of Frame) do USB. Ambos precisam se sincronizar com o SOF.
 % https://www.mouser.com/pdfDocs/usb-audio-simplified.pdf
@@ -162,7 +172,7 @@ No USB Full Speed, um frame se refere a uma transferência de 1ms de duração, 
 Processamento digital de áudio se refere a uma seção do processamento de sinais com foco na manipulação de sinais de áudio, sendo esses representações digitais de ondas sonoras.
 Seu uso inicial era focado em invenções como o telefone e o rádio, que necessitavam de manipulação para vencer problemas inerentes da tecnologia, relacionados a sua transmissão.
 Após avanços na teoria da comunicação, do teorema da amostragem e da invenção da modulação por código de pulso, um novo leque de aplicações se mostrou possível, inclusive na área de manipulação e até criação de música.
-Hoje, métodos de processamento abrangem desde armazenamento e compressão até síntese e melhorias, como equalização, filtragem, compressão e remoção de eco.
+Hoje, métodos de processamento abrangem desde armazenamento e compressão até síntese e melhorias, como equalização, filtragem, compressão e redução ativa de ruído. Essas melhorias são utilizadas com focos para consumidores finais ou em âmbitos profissionais. Em exemplo, o cancelamento de ruído é utilizado em fones de ouvido comuns para remoção de ruídos como transporte, e aplicado em ambientes profissionais que requerem um nivel acima de cancelamento do atingido por métodos passivos).
 
 \subsection{Filtros FIR/IIR}
 

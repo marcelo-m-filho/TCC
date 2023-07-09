@@ -31,9 +31,9 @@ Controlador STM32F769NI possui capacidade um pouco maior de processamento
 
 Diversos sistemas operacionais possuem as especificações necessárias para se comunicarem com o dispositivo sem necessidade de instalação de drivers. Os sistemas mais utilizados em computadores pessoais atualmente, como Windows, Linux e MacOS, possuem drivers para comunicação com dispositivos de áudio por USB.
 
-Além disso, sistemas operacionais de dispositivos móveis também possuem compatibilidade direta com o dispotivivo. Nessa lista, incluem-se os dois sistemas mais utilizados, Android e iOS.
+Além disso, sistemas operacionais de dispositivos móveis também possuem compatibilidade direta com o dispositivo. Nessa lista, incluem-se os dois sistemas mais utilizados, Android e iOS.
 
-Embora os computadores ou dispositivos móveis nos quais os sitemas operacionais estão inseridos possivelmente já possuam uma solução de saída de áudio, é possível ser feita a sobreposição desse sistema, onde o áudio é enviado ao dispositivo ao invés de pela saída padrão.
+Embora os computadores ou dispositivos móveis nos quais os sistemas operacionais estão inseridos possivelmente já possuam uma solução de saída de áudio, é possível ser feita a sobreposição desse sistema, onde o áudio é enviado ao dispositivo ao invés de pela saída padrão.
 
 \begin{figure}[!h]
   \includegraphics[scale=0.5]{figuras/usb-android-dscs.png}
@@ -107,46 +107,146 @@ Essa escolha foi tomada pensando na melhor relação entre o ganho de produtivid
 
 
 \subsection{HAL, BSP e CMSIS}
-Este projeto conta com a utilização de camadas de abstração de hardware que ???. Entre elas, estão a HAL (Hardware Abstraction Layer), BSP (Board Support Package) e CMSIS (Common Microcontroller Software Interface Standard).
-\\[10pt]
+Este projeto conta utiliza a arquitetura de abstração de hardware necessária para desenvolvimento de hardware em controladores da STM32. 
+
+A arquitetura principal pode ser dividida em três níveis:
+\begin{itemize}
+    \item Nível 2: Aplicação. Essa camada contém a lógica de mais alto nível que tem como função implementar as funcionalidades da aplicação em si. O código desenvolvido pelo usuário dos microcontroladores costuma ficar em grande parte nessa camada, indo para camadas de mais baixo nível conforme necessário. Nessa camada também podem ser encontrados projetos de exemplo de utilização da placa (como demonstrações básicas de relações entere botões e LEDs, por exemplo), e projetos de código padronizado que montam uma base para que um projeto possa ser feito em cima dele.
+
+    \item Nível 1: \textit{Middleware}. Nessa camada são encontradas bibliotecas de código que tem como função realizar a interface entre as camadas de mais baixo nível de abstração e a camada de aplicação. Um exemplo de middleware é o FreeRTOS, um sistema operacional em tempo real que permite a utilização de conceitos de execução de tarefas em pseudo paralelismo com restrições de tempo de execução.
+
+    \item Nível 0: Drivers. Esse nível se divide em diversas bibliotecas que tem como intuito realizar a interface direta entre o hardware e as camadas de mais alto nível. APIs para inicialização, configuração e comunicação com periféricos como I2C e UART. Entre as bibliotecas encontradas nessa camada, estão a HAL (Hardware Abstraction Layer), BSP (Board Support Package) e CMSIS (Common Microcontroller Software Interface Standard).
+\end{itemize}
+
+
 % https://en.wikipedia.org/wiki/Hardware_abstraction
 % https://www.techopedia.com/definition/4288/hardware-abstraction-layer-hal
 % https://emteria.com/learn/hardware-abstraction-layer
+\begin{figure}[!h]
+  \includegraphics[scale=0.5]{figuras/stm32-architecture.png}
+  \caption{Desenho de arquitetura do ecossistema STM32 embarcado !! marcar como adaptado !!}
+\end{figure}
 
-
-A \textit{Hardware Abstraction Layer (HAL)} é uma camada de bibliotecas de código que possui a função de entregar uma interface de desenvolvimento padronizada que permita interações com o hardware sem necessidade do conhecimento direto do hardware em questão 
+A \textit{Hardware Abstraction Layer (HAL)} é uma biblioteca de código que possui a função de entregar uma interface de desenvolvimento padronizada que permita interações com o hardware sem necessidade do conhecimento direto do hardware em questão. Essa biblioteca tem seu foco na comunicação com periféricos internos, como os de acesso direto de memória (DMA) e de interface serial de áudio (SAI).
 % [[FONTE]](https://emteria.com/learn/hardware-abstraction-layer).
 
 Isso permite uma maior portabilidade do código, o qual se torna compatível com qualquer hardware que também esteja incluso nessa camada de abstração.
-Uma HAL é comumente acessível como uma API que realiza o trabalho de inicialização, configuração e acesso a um hardware específico. Para este projeto, foi utilizada a HAL V1.2.6, lançada em 29 de junho de 2018.
+Uma HAL é comumente utilizada para realização do trabalho de inicialização, configuração e acesso a um hardware específico. Para este projeto, foi utilizada a HAL V1.2.6, lançada em 29 de junho de 2018.
 \\[10pt]
 
-A \textit{Board Support Package (BSP)} é uma coleção de APIs, drivers e arquivos de configuração que tem como intuito facilitar o desenvolvimento em uma placa específica. 
+A \textit{Board Support Package (BSP)} é uma coleção de APIs, drivers e arquivos de configuração que tem como intuito facilitar o desenvolvimento em uma placa específica. Sua composição é geralmente feita em interface com APIs da Hardware Abstraction Layer (HAL), com a intenção de sintetizar uma API ainda de mais fácil utilização para o hardware conhecido de uma determinada placa.
+
 Para este projeto, foi utilizado a BSP da placa STM32F769I-DISCO.
 \\[10pt]
 
-O \textit{Common Microcontroller Software Interface Standard (CMSIS)} é um conjunto de ferramentas, \textit{frameworks} e funcionalidades que implementam funcionalidades, mecânicas e utilidades comumente utilizadas no desenvolvimento embarcado, com o intuito de reduzir o atrito inicial do desenvolvimento, evitar re-trabalhos e reduzir e o tempo até o mercado de um produto até o mercado. Ele funciona em paralelo à Hardware Abstraction Layer, inclusive dependendo da versão específica dessa abstração para alguma de suas funcionalidades.
+O \textit{Common Microcontroller Software Interface Standard (CMSIS)}, é um conjunto de bibliotecas que implementam funcionalidades comumente utilizadas no desenvolvimento embarcado, com o intuito de reduzir o atrito inicial do desenvolvimento, evitar re-trabalhos e reduzir e o tempo até o mercado de um produto até o mercado. Ele funciona em paralelo à Hardware Abstraction Layer, inclusive dependendo da versão específica dessa abstração para alguma de suas funcionalidades. Diferentemente da HAL e BSP, esta biblioteca não é diretamente ligada à STM32, e sim compartilhada entre diversas empresas que possuem seus controladores desenvolvidos na tecnologia ARM.
 
+
+Embora as bibliotecas BSP e HAL sejam criadas pela STM32, sua compatibilidade não é imediatamente garantida. Para seu funcionamento correto, as bibliotecas devem estar em versões compatíveis entre si.
+
+No projeto \textit{X-CUBE-USB-AUDIO}, disponibilizado pela STM32 como exemplo de comunicação os periféricos de áudio por meio das bibliotecas de abstração, uma versão mais antiga da HAL foi utilizada como base para a interface entre o nível de aplicação e os periféricos de USB e áudio. Este projeto possui como base a versão 1.2.6 da HAL, disponibilizada em junho de 2018. Novos projetos criados pela IDE STM32CubeMX, porém, contam por padrão com a versão mais nova (que, durante o desenvolvimento deste projeto, era a versão 2.0.2, de junho de 2022).
+
+As duas versões utilizadas da HAL possuem diferenças suficientes entre si a ponto de serem incompatíveis. Embora possuam essencialmente a mesma funcionalidade (com correções de problemas e otimizações presentes na versão mais nova), mudanças em parâmetros de funções e estruturas de dados, como mostrado na Listagem \ref{code:hal-differences}, não permitem que um código escrito para uma versão antiga da HAL seja integrado a um código escrito para a versão mais recente.
+
+\begin{sourcecode}[!ht]
+\centering
+\begin{minted}{c}
+// v1.2.6
+typedef struct
+{
+    int8_t  (*Init) (
+        USBD_AUDIO_FunctionDescriptionfTypeDef* as_desc, 
+        uint32_t private_data
+    );
+    int8_t  (*DeInit) (
+        USBD_AUDIO_FunctionDescriptionfTypeDef* as_desc,
+        uint32_t private_data
+    );
+    int8_t  (*GetConfigDesc) (
+        uint8_t **p_data, 
+        uint16_t *p_size, 
+        uint32_t private_data
+    );
+    int8_t  (*GetState) (uint32_t privatedata);
+    uint32_t private_data;  
+} USBD_AUDIO_ItfTypeDef;
+
+
+// v2.0.2
+typedef struct
+{
+  int8_t (*Init)(uint32_t AudioFreq, uint32_t Volume, uint32_t options);
+  int8_t (*DeInit)(uint32_t options);
+  int8_t (*AudioCmd)(uint8_t *pbuf, uint32_t size, uint8_t cmd);
+  int8_t (*VolumeCtl)(uint8_t vol);
+  int8_t (*MuteCtl)(uint8_t cmd);
+  int8_t (*PeriodicTC)(uint8_t *pbuf, uint32_t size, uint8_t cmd);
+  int8_t (*GetState)(void);
+} USBD_AUDIO_ItfTypeDef;
+
+\end{minted}
+\caption{Exemplo de diferença de uma mesma estrutura de dados em diferentes versões da Hardware Abstraction Layer (HAL)}
+\label{code:hal-differences}
+\end{sourcecode}
+
+Com o intuito de se utilizar a versão mais nova da HAL, foi tomado como foco de desenvolvimento a atualização do projeto de áudio para a versão mais nova da biblioteca, a fim de tornar o projeto compatível com as versões mais recentes geradas pela IDE.
+
+Esta atualização se tornou inviável, porém, devido à integração também existente entre a biblioteca de suporte de placa (BSP) e a HAL. Como a BSP tem como função trazer uma abstração focada em componentes específicos de uma placa de desenvolvimento, muitas vezes chamadas de APIs da HAL são utilizadas (já que várias placas utilizam controladores idênticos ou similares, com muitos periféricos em comum). Isso implica que a atualização da HAL em um projeto faz com que chamadas da BSP parem de funcionar, devido a esperarem uma versão específica ao realizarem chamadas para a HAL. Em diversas situações, essas incompatibilidades se demonstravam apenas como \textit{hard faults}, devido a acessos indevidos de memória.
+
+Para que o projeto de áudio ficasse compatível com novos projetos, uma re-escrita extensiva de diversos módulos de ambas BSP e HAL seria necessária. Uma avaliação foi então feita da complexidade das chamadas de periféricos que seriam utilizados na versão moderna da HAL (como comunicações serial, com a tela LCD e sua interface \textit{touch}). Como esses periféricos não são utilizados tão a fundo quanto a sequência de periféricos USB e de saída de áudio, foi constatado que o processo inverso, de rebaixar a versão da HAL utilizada pelos periféricos no projeto mais atualizado, seria mais produtivo.
+
+Essa abordagem, embora também perdendo facilidades como a configuração visual de componentes disponibilizada para projetos mais modernos, ainda se mostrou mais viável, e permitiu a utilização simultânea de todos os periféricos necessários para o funcionamento do projeto.
 \color{orange}
-As partes não são diretamente compatíveis: BSP, HAL e CMSIS devem estar em versões corretas para que sua interação ocorra corretamente
 
-O editor Mbed não disponibiliza acesso fácil à essas camadas de abstração, não sendo uma opção viável para o projeto
 
-A versão de BSP utilizada no projeto base de comunicação de áudio USB utilizava uma versão antiga da HAL
+% Horoscope: V1.2.6 / 29-June-2018
+% ApplePie: V2.0.2 / 10-June-2022
 
-As bibliotecas de interface humana (\textit{display}, \textit{touch}, serial) utilizavam uma versão mais atualizada da HAL
+% // v1.2.6
+% typedef struct
+% {
+%     int8_t  (*Init)         (USBD_AUDIO_FunctionDescriptionfTypeDef* as_desc , uint32_t private_data);
+%     int8_t  (*DeInit)       (USBD_AUDIO_FunctionDescriptionfTypeDef* as_desc,uint32_t private_data);
+%     int8_t  (*GetConfigDesc) (uint8_t ** p_data, uint16_t * p_size, uint32_t private_data);
+%     int8_t  (*GetState)     (uint32_t privatedata);
+%     uint32_t private_data;  
+% } USBD_AUDIO_ItfTypeDef;
 
-A ideia inicial era de portar o código antigo da BSP de áudio USB para a nova HAL (e permitir a utilização das funcionalidades de controle visual de hardware)
 
-A junção inicial dos códigos não foi bem sucedida, fazendo com que as funcionalidades em conjunto causassem hard faults sem motivo aparente
+% // v2.0.2
+% typedef struct
+% {
+%   int8_t (*Init)(uint32_t AudioFreq, uint32_t Volume, uint32_t options);
+%   int8_t (*DeInit)(uint32_t options);
+%   int8_t (*AudioCmd)(uint8_t *pbuf, uint32_t size, uint8_t cmd);
+%   int8_t (*VolumeCtl)(uint8_t vol);
+%   int8_t (*MuteCtl)(uint8_t cmd);
+%   int8_t (*PeriodicTC)(uint8_t *pbuf, uint32_t size, uint8_t cmd);
+%   int8_t (*GetState)(void);
+% } USBD_AUDIO_ItfTypeDef;
 
-A causa eram devido a mudanças entre versões da HAL serem bem abrangentes, incluindo parâmetros de funções e estruturas de dados
+% STM32CubeF7 Firmware Package V1.17.0 / 10-June-2022
 
-Foram identificados problemas onde acessos indevidos de memória devido à mudança das estruturas (onde uma estrutura era acessada no formato de outra estrutura, causando undefined behavior
 
-Atualizar a versão antiga da BSP precisaria quase de uma reescrita do código de conexão com a HAL, o que incluiria re-escrita de toda a camada de abstração de comunicação USB
 
-Foi preferido realizar o processo inverso, e realizar um \textit{downgrade} da HAL das funcionalidades de interface humana para serem compatíveis com o código BSP de áudio USB
+% https://wiki.st.com/stm32mpu/index.php?title=STM32CubeMP1_architecture&oldid=77377
+% As partes não são diretamente compatíveis: BSP, HAL e CMSIS devem estar em versões corretas para que sua interação ocorra corretamente
+
+% A versão de BSP utilizada no projeto base de comunicação de áudio USB utilizava uma versão antiga da HAL
+
+% As bibliotecas de interface humana (\textit{display}, \textit{touch}, serial) utilizavam uma versão mais atualizada da HAL
+
+% A ideia inicial era de portar o código antigo da BSP de áudio USB para a nova HAL (e permitir a utilização das funcionalidades de controle visual de hardware)
+
+% A junção inicial dos códigos não foi bem sucedida, fazendo com que as funcionalidades em conjunto causassem hard faults sem motivo aparente
+
+% A causa eram devido a mudanças entre versões da HAL serem bem abrangentes, incluindo parâmetros de funções e estruturas de dados
+
+% Foram identificados problemas onde acessos indevidos de memória devido à mudança das estruturas (onde uma estrutura era acessada no formato de outra estrutura, causando undefined behavior
+
+% Atualizar a versão antiga da BSP precisaria quase de uma reescrita do código de conexão com a HAL, o que incluiria re-escrita de toda a camada de abstração de comunicação USB
+
+% Foi preferido realizar o processo inverso, e realizar um \textit{downgrade} da HAL das funcionalidades de interface humana para serem compatíveis com o código BSP de áudio USB
 
 Outra causa de \textit{hard faults} era devido a os códigos eram inicializados simultaneamente. Cada módulo funcionava corretamente em isolamento, porém causavam a placa a parar de responder caso fossem inicializados juntos
 
@@ -174,6 +274,8 @@ Comentar do uso de 2 canais (stereo)
 Comentar do uso de 16 bit (mostrar relação com noise floor já aceitável)
 
 Comentar de buffer size ser 10240 bytes (com margem de 1 packet)
+
+
 
 % // computes the nominal size(number of bytes) of an audio packet required for one millisecond
 % // e.g. for 48KHZ   / 24 bits / stereo, the required size is 48 * 3 * 2
@@ -210,6 +312,12 @@ Para se adequar ao padrão produtor-consumidor utilizado na transmissão USB, um
 
 Ponteiros de leitura e escrita são utilizados para indicação de onde novos pacotes devem ser lidos e onde devem ser escritos, respectivamente. O ponteiro de leitura é administrado pelo nó de saída de áudio, e o de escrita pelo nó de entrada USB.
 
+\begin{figure}[!h]
+  \includegraphics[scale=0.4]{figuras/buffer.png}
+  \caption{Representação das partes que compõem o buffer circular}
+  \label{fig:bufferBytes}
+\end{figure}
+
 \color{orange}
 
 Explicar como dados são inseridos no buffer. O ponteiro de escrita é então incrementado para refletir a presença dos novos dados presentes no buffer.
@@ -224,6 +332,23 @@ Para todas as escritas e leituras serem de uma área contínua de memória, uma 
 Caso dados sejam escritos de forma que ultrapassem o fim do buffer, a quantidade restante é escrita na margem. Posteriormente, esses dados são corretamente re-escritos no começo do buffer. 
 
 Em casos que não existem dados suficientes para serem escritos ao SAI, um buffer alternativo contendo apenas zeros é utilizado.
+
+% ponteiros de buffer se movem por número de packets possíveis 
+% /**
+%   * @brief  USB_AudioStreamingInitializeDataBuffer
+%   *         The circular buffer has the total size of buffer_size. this size is divided to two : the regular size and the margin.
+%   *         Margin is located at the tail of the circular buffer. Margin is used as some packet have regular size+/-1 sample. 
+%   * @param  buf:  main circular buffer               
+%   * @param  buffer_size: whole buffer size when allocated                
+%   * @param  packet_size:USB Audio packet size 
+%   * @param  margin: protection area size
+%   * @retval 0 if no error
+%   */
+%   void USB_AudioStreamingInitializeDataBuffer(AUDIO_CircularBuffer_t* buf, uint32_t buffer_size, uint16_t packet_size, uint16_t margin)
+%  {
+%     buf->size = ((int)((buffer_size - margin) / packet_size)) * packet_size; 
+%     buf->rd_ptr = buf->wr_ptr = 0;
+%  }
 
 
 \subsection{Processamento de sinal (interceptador)}
@@ -275,8 +400,10 @@ A interface homem-máquina é feita com a utilização do LCD embarcado na placa
 
 O dispositivo também conta com resposta à toque, permitindo com que o usuário interaja diretamente com os dados mostrados em tela. Um sistema de botões radiais foi desenvolvido para permitir que o usuário possa alternar entre os filtros em tempo real.
 
-!! Foi feita uma configuração de botões extensível, para que a interface com o usuário possa ser posteriormente personalizada. Os botões podem ser ligados entre si, para que apenas um fique ativo por vez, ou serem independentes. Os botões podem ser posicionados em qualquer posição vertical e horizontal da tela, e sua cor quando desligados e ligados pode ser personalizada.
+\color{orange}
+Foi feita uma configuração de botões extensível, para que a interface com o usuário possa ser posteriormente personalizada. Os botões podem ser ligados entre si, para que apenas um fique ativo por vez, ou serem independentes. Os botões podem ser posicionados em qualquer posição vertical e horizontal da tela, e sua cor quando desligados e ligados pode ser personalizada.
 A adição de novos botões pode ser feita com pouco acréscimo de código, apenas estendendo a lista de botões já criados.
+\color{black}
 
 \section{PDS}
 
